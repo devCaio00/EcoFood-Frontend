@@ -1,122 +1,86 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { NavLink, Route, Routes } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { listarUsuarios } from "./api/recursos";
+import { usePerfil } from "./context/PerfilContext";
+import { Doacoes } from "./pages/Doacoes";
+import { NovaDoacao } from "./pages/NovaDoacao";
+import { MinhasReservas } from "./pages/MinhasReservas";
+import { Pessoas } from "./pages/Pessoas";
 
-function App() {
-  const [count, setCount] = useState(0)
+function SeletorPerfil() {
+  const { perfil, definirPerfil } = usePerfil();
+
+  const { data: usuarios = [] } = useQuery({
+    queryKey: ["usuarios"],
+    queryFn: listarUsuarios,
+  });
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <select
+      value={perfil?.id ?? ""}
+      onChange={(e) => {
+        const id = Number(e.target.value);
+        definirPerfil(usuarios.find((u) => u.id === id) ?? null);
+      }}
+      className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+      aria-label="Perfil em uso"
+    >
+      <option value="">— selecione um perfil —</option>
+      {usuarios.map((u) => (
+        <option key={u.id} value={u.id}>
+          {u.nome} ({u.tipoUsuario})
+        </option>
+      ))}
+    </select>
+  );
 }
 
-export default App
+const LINKS = [
+  { to: "/doacoes", label: "Doacoes" },
+  { to: "/nova-doacao", label: "Doar alimentos" },
+  { to: "/minhas-reservas", label: "Minhas reservas" },
+  { to: "/pessoas", label: "Pessoas" },
+];
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-ecofood-verde px-4 py-3">
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3">
+          <span className="text-lg font-bold text-white">EcoFood</span>
+          <SeletorPerfil />
+        </div>
+      </header>
+
+      <nav className="bg-ecofood-claro px-4 py-2">
+        <div className="mx-auto flex max-w-4xl flex-wrap gap-2">
+          {LINKS.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                `rounded-md px-3 py-1 text-sm font-medium ${
+                  isActive
+                    ? "bg-ecofood-verde text-white"
+                    : "text-ecofood-verde hover:bg-white"
+                }`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        <Routes>
+          <Route path="/" element={<Doacoes />} />
+          <Route path="/doacoes" element={<Doacoes />} />
+          <Route path="/nova-doacao" element={<NovaDoacao />} />
+          <Route path="/minhas-reservas" element={<MinhasReservas />} />
+          <Route path="/pessoas" element={<Pessoas />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
