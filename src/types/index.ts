@@ -54,6 +54,27 @@ export interface NovoUsuario {
   telefone?: string;
   tipoUsuario: TipoUsuario;
   endereco: string;
+  senha?: string;
+}
+
+export interface LoginPayload {
+  email: string;
+  senha: string;
+}
+
+// Resposta do POST /auth/login (token Bearer do ASP.NET)
+export interface TokenResposta {
+  accessToken: string;
+  expiresIn: number; // segundos
+}
+
+export interface AtualizarUsuario {
+  nome: string;
+  email: string;
+  telefone?: string | null;
+  endereco: string;
+  senhaAtual?: string;
+  novaSenha?: string;
 }
 
 export interface NovaDoacao {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { criarReserva, listarDoacoes } from "../api/recursos";
 import { extrairMensagemErro } from "../api/client";
-import { usePerfil } from "../context/PerfilContext";
+import { usePerfil } from "../context/useAuth";
 import { DoacaoCard } from "../components/DoacaoCard";
 
 export function Doacoes() {
@@ -19,7 +19,7 @@ export function Doacoes() {
     mutationFn: (doacaoId: number) =>
       criarReserva({
         doacaoId,
-        receptorId: perfil!.id,
+        receptorId: perfil.id,
         // Sempre true aqui: esta funcao so e chamada depois que o
         // ConfirmarEnderecoPanel liberou o botao.
         enderecoConfirmado: true,
@@ -39,13 +39,7 @@ export function Doacoes() {
         Doacoes disponiveis
       </h1>
 
-      {!perfil && (
-        <p className="mb-4 rounded-md bg-amber-50 p-3 text-sm">
-          Selecione um perfil no topo da pagina para reservar.
-        </p>
-      )}
-
-      {perfil && !ehReceptor && (
+      {!ehReceptor && (
         <p className="mb-4 rounded-md bg-gray-100 p-3 text-sm">
           Apenas perfis Receptor podem reservar. Perfil atual: {perfil.tipoUsuario}.
         </p>

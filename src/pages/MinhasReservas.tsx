@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cancelarReserva, concluirReserva, listarReservas } from "../api/recursos";
-import { usePerfil } from "../context/PerfilContext";
+import { usePerfil } from "../context/useAuth";
 import { StatusChip } from "../components/StatusChip";
 
 export function MinhasReservas() {
@@ -8,9 +8,8 @@ export function MinhasReservas() {
   const queryClient = useQueryClient();
 
   const { data: reservas = [], isLoading } = useQuery({
-    queryKey: ["reservas", perfil?.id],
-    queryFn: () => listarReservas(perfil!.id),
-    enabled: !!perfil,   // so chama a API quando ha perfil selecionado
+    queryKey: ["reservas", perfil.id],
+    queryFn: () => listarReservas(perfil.id),
   });
 
   const invalidar = () => {
@@ -27,13 +26,6 @@ export function MinhasReservas() {
     mutationFn: cancelarReserva,
     onSuccess: invalidar,
   });
-
-  if (!perfil)
-    return (
-      <p className="rounded-md bg-amber-50 p-3 text-sm">
-        Selecione um perfil no topo da pagina.
-      </p>
-    );
 
   return (
     <section>
