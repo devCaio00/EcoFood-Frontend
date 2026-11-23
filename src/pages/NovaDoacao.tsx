@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { criarDoacao } from "../api/recursos";
 import { extrairMensagemErro } from "../api/client";
-import { usePerfil } from "../context/PerfilContext";
+import { usePerfil } from "../context/useAuth";
 
 export function NovaDoacao() {
   const { perfil, ehDoador } = usePerfil();
@@ -19,7 +19,7 @@ export function NovaDoacao() {
   const publicar = useMutation({
     mutationFn: () =>
       criarDoacao({
-        doadorId: perfil!.id,
+        doadorId: perfil.id,
         descricao,
         categoria: categoria || undefined,
         quantidade,
@@ -38,13 +38,6 @@ export function NovaDoacao() {
     },
     onError: (erro) => setAviso(extrairMensagemErro(erro)),
   });
-
-  if (!perfil)
-    return (
-      <p className="rounded-md bg-amber-50 p-3 text-sm">
-        Selecione um perfil no topo da pagina.
-      </p>
-    );
 
   if (!ehDoador)
     return (

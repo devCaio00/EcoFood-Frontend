@@ -9,6 +9,7 @@ export default {
       colors: {
         ecofood: {
           verde: "#27633f",
+          escuro: "#173d27",
           claro: "#e8f5e9",
           ambar: "#c97a2b",
         },
